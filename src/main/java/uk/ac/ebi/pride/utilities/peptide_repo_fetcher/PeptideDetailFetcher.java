@@ -18,6 +18,14 @@ import uk.ac.ebi.pride.utilities.peptide_repo_fetcher.util.model.PRIDEClusterRes
 import uk.ac.ebi.pride.utilities.peptide_repo_fetcher.util.model.PRIDEClusterResultList;
 import uk.ac.ebi.pride.utilities.util.Tuple;
 
+/**
+ * This class retrieve for a Peptide (Peptide+ProteinID) the number of observations in different repositories such as
+ * GPMDB and PRIDE Cluster. If the peptide is not founded, then the number of observations is 0, if the Peptide is not found
+ * it in any repository the status is set to UNKNOWN.
+ *
+ *
+ * @author ypriverol
+ */
 public class PeptideDetailFetcher {
 
     private static final Logger logger = LoggerFactory.getLogger(PeptideDetailFetcher.class);
@@ -39,28 +47,28 @@ public class PeptideDetailFetcher {
     /**
      * Returns various details for the given protein (f.e. name,
      * sequence).
-     * @param sequences for every peptide.
+     * @param peptides for every peptide.
      * @return A Protein object containing the additional information.
      * @throws Exception error when retrieving protein accession
      */
-    public Map<Tuple, Peptide> getPeptideDetails(Collection<Tuple> sequences) throws Exception {
+    public Map<Tuple, Peptide> getPeptideDetails(Collection<Tuple> peptides) throws Exception {
 
-        Map<Tuple, Peptide> peptides = new HashMap<Tuple, Peptide>();
+        Map<Tuple, Peptide> rsPeptides = new HashMap<Tuple, Peptide>();
 
-        peptides.putAll(getClusterPeptideDetails(sequences));
+        rsPeptides.putAll(getClusterPeptideDetails(peptides));
 
-        peptides = addGPMDBInformation(peptides);
+        rsPeptides = addGPMDBInformation(rsPeptides);
     	
     	// add empty protein objects for all proteins that could not be retrieved
     	// and set the status to DELETED
-    	for (Tuple tuple : sequences) {
-    		if (!peptides.containsKey(tuple)) {
+    	for (Tuple tuple : peptides) {
+    		if (!rsPeptides.containsKey(tuple)) {
     			Peptide p = new Peptide(tuple);
     			p.setStatus(Peptide.STATUS.UNKNOWN);
-    			peptides.put(tuple, p);
+    			rsPeptides.put(tuple, p);
     		}
     	}
-        return peptides;
+        return rsPeptides;
     }
 
     private Map<Tuple, Peptide> addGPMDBInformation(Map<Tuple, Peptide> peptides) throws IOException {
@@ -70,18 +78,26 @@ public class PeptideDetailFetcher {
         for(Tuple tuple: peptides.keySet()){
             String sequence = (String) tuple.getValue();
             GPMDBResult result = gpmDBClient.getObservByProtein(sequence);
-            Peptide peptide = peptides.get(sequence);
-            Map<Integer, Integer> gpmdbOvs = new HashMap<Integer, Integer>();
+            Peptide peptide = peptides.get(tuple);
+            Integer gpmObservation = 0;
             if(result != null){
-                if(result.observations.containsKey((String)tuple.getKey()));
+                /**
+                 * Right now GPMDB do not have any mapping system, at least in the web-services, we will use the more conservative
+                 * approach by looking inside the GPMDB ids if it contains the Id of the protein. We will clean the Protein iD to remove the
+                 * prefix sp or gi from the ids.
+                 */
+                String proteinID = (String) tuple.getKey();
+                for(String resultId: result.observations.keySet()){
+                    if(resultId.contains(proteinID)){
+                       gpmObservation = result.observations.get(resultId);
+                    }
+                }
             }
-            peptide.setGpmDBObsv(1);
+            peptide.setGpmDBObsv(gpmObservation);
             resultPeptides.put(tuple, peptide);
         }
         return resultPeptides;
     }
-
-
 
     private Map<Tuple, Peptide> getClusterPeptideDetails(Collection<Tuple> sequences) throws Exception {
     	// build the query string for the accessions

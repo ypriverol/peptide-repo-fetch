@@ -36,7 +36,7 @@ public class PeptideDetailFetcherTest {
         Map<Tuple, Peptide> peptides = detailFetcher.getPeptideDetails(sequences);
 
         for(Tuple sequence: peptides.keySet()){
-            System.out.println(sequence + "\t" + "gpmdObserv charge 2: " + peptides.get(sequence).getGpmDBObsv());
+            System.out.println(sequence + "\t" + "GPMDB Observations: " + peptides.get(sequence).getGpmDBObsv());
         }
     }
 }

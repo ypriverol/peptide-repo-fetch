@@ -11,7 +11,7 @@ import java.util.*;
  * For example for gpmDB should be the number of observations in GPMDB, and in PRIDE Cluster will be the number
  * of reliable clusters that contain the specific protein and sequence. When the sequence is not found it in any resource
  * the value is 0 for the specific resource. If the sequence is not found it in any resource then the status is
- * UNKNOWN. 
+ * UNKNOWN.
  *
  * <p/>
  * user: @ypriverol
@@ -25,9 +25,9 @@ public class Peptide implements Serializable {
 
     public Integer prideClusterObserv;
 
-    public STATUS status;
-
     public Integer gpmDBObsv;
+
+    public STATUS status = STATUS.UNKNOWN;
 
     public Peptide(Tuple info){
         this.info = info;

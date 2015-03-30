@@ -1,8 +1,8 @@
 package uk.ac.ebi.pride.utilities.peptide_repo_fetcher.util.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.*;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -28,6 +28,19 @@ public class GPMDBResult {
 //    @JsonProperty("5")
 //    public int fiveCharge;                     // number of unique peptides in this assay
 
-    public Map<String, Integer> observations;    // Map a set of properties such as PROTEINID -> NUMBER OF OBSERVATIONS
+    public Map<String, Integer> observations = new HashMap<String, Integer>();    // Map a set of properties such as PROTEINID -> NUMBER OF OBSERVATIONS
 
+    @JsonAnyGetter
+    public Map<String, Integer> any() {
+        return observations;
+    }
+
+    @JsonAnySetter
+    public void set(String name, Integer value) {
+        observations.put(name, value);
+    }
+
+    public boolean hasUnknowProperties() {
+        return !observations.isEmpty();
+    }
 }

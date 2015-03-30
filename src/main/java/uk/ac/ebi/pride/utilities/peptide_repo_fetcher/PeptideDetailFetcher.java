@@ -54,19 +54,19 @@ public class PeptideDetailFetcher {
     	// add empty protein objects for all proteins that could not be retrieved
     	// and set the status to DELETED
     	for (Tuple tuple : sequences) {
-    		if (!peptides.containsKey(accession)) {
-    			Peptide p = new Peptide(accession);
+    		if (!peptides.containsKey(tuple)) {
+    			Peptide p = new Peptide(tuple);
     			p.setStatus(Peptide.STATUS.UNKNOWN);
-    			peptides.put(accession, p);
+    			peptides.put(tuple, p);
     		}
     	}
         return peptides;
     }
 
-    private Map<String, Peptide> addGPMDBInformation(Map<Tuple, Peptide> peptides) throws IOException {
+    private Map<Tuple, Peptide> addGPMDBInformation(Map<Tuple, Peptide> peptides) throws IOException {
 
         gpmDBClient = new GPMDBClient(gpmDBWSConfig);
-        Map<String, Peptide> resultPeptides = new HashMap<String, Peptide>(peptides.size());
+        Map<Tuple, Peptide> resultPeptides = new HashMap<Tuple, Peptide>(peptides.size());
         for(Tuple tuple: peptides.keySet()){
             String sequence = (String) tuple.getValue();
             GPMDBResult result = gpmDBClient.getObservByProtein(sequence);
@@ -76,7 +76,7 @@ public class PeptideDetailFetcher {
                 if(result.observations.containsKey((String)tuple.getKey()));
             }
             peptide.setGpmDBObsv(1);
-            resultPeptides.put(sequence, peptide);
+            resultPeptides.put(tuple, peptide);
         }
         return resultPeptides;
     }

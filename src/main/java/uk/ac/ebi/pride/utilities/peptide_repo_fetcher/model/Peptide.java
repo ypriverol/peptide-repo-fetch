@@ -7,13 +7,19 @@ import java.util.*;
 
 /**
  * Object to store protein related details
+ * A Peptide will be a Tuple Protein ID + Sequence. The observations will be a number for every resource.
+ * For example for gpmDB should be the number of observations in GPMDB, and in PRIDE Cluster will be the number
+ * of reliable clusters that contain the specific protein and sequence. When the sequence is not found it in any resource
+ * the value is 0 for the specific resource. If the sequence is not found it in any resource then the status is
+ * UNKNOWN. 
+ *
  * <p/>
  * user: @ypriverol
  */
 @SuppressWarnings("serial")
 public class Peptide implements Serializable {
 
-    public enum STATUS {UNKNOWN, HIGH, MEDIUM, POOR, ERROR};
+    public enum STATUS {UNKNOWN, HIGH, MEDIUM, POOR};
 
     public Tuple info;  // Peptide Sequence and Protein accession
 

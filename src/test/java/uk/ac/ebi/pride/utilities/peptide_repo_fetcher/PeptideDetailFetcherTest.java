@@ -1,33 +1,42 @@
 package uk.ac.ebi.pride.utilities.peptide_repo_fetcher;
 
-import junit.framework.TestCase;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import uk.ac.ebi.pride.utilities.peptide_repo_fetcher.model.Peptide;
+import uk.ac.ebi.pride.utilities.util.Tuple;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class PeptideDetailFetcherTest extends TestCase {
+public class PeptideDetailFetcherTest {
 
     PeptideDetailFetcher detailFetcher = null;
 
+    @Before
     public void setUp() throws Exception {
         detailFetcher = new PeptideDetailFetcher();
 
     }
-
+    @After
     public void tearDown() throws Exception {
 
     }
 
+    @Test
     public void testGetPeptideDetails() throws Exception {
-        List<String> sequences = new ArrayList<String>();
-        sequences.add("SPSSVEPVADMLMGLFFR");
+        List<Tuple> sequences = new ArrayList<Tuple>();
 
-        Map<String, Peptide> peptides = detailFetcher.getPeptideDetails(sequences);
+        sequences.add(new Tuple("YLR347C","SPSSVEPVADMLMGLFFR"));
 
-        for(String sequence: peptides.keySet()){
-            System.out.println(sequence + "\t" + "gpmdObserv charge 2: " + peptides.get(sequence).gpmObservationsByCharge(2));
+        Map<Tuple, Peptide> peptides = detailFetcher.getPeptideDetails(sequences);
+
+        for(Tuple sequence: peptides.keySet()){
+            System.out.println(sequence + "\t" + "gpmdObserv charge 2: " + peptides.get(sequence).getGpmDBObsv());
         }
     }
 }

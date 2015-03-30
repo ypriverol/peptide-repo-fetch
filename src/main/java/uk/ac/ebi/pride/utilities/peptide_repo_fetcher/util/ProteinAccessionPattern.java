@@ -40,6 +40,10 @@ public enum ProteinAccessionPattern {
       */
     GI(Pattern.compile("[\\d]+"),
             new MessageFormat("http://www.ncbi.nlm.nih.gov/protein/{0}")),
+
+    GI_EXTENDED(Pattern.compile("gi\\|([\\d]+)\\|"),
+            new MessageFormat("http://www.ncbi.nlm.nih.gov/protein/{0}")),
+
     /**
      * SGD for example: S000005574
      */
@@ -139,7 +143,7 @@ public enum ProteinAccessionPattern {
      * @return  boolean true if it is a GI accession.
      */
     public static boolean isGIAccession(String acc) {
-        return isMatchAccession(GI.getIdPattern(), acc);
+        return (isMatchAccession(GI.getIdPattern(), acc) || isMatchAccession(GI_EXTENDED.getIdPattern(), acc));
     }
 
     /**
@@ -175,10 +179,9 @@ public enum ProteinAccessionPattern {
     }
 
     public static String getGIAccession(String proteinID) {
-        Pattern giPattern = Pattern.compile(".gi\\|*\\|.");
-        Matcher matcher = giPattern.matcher(proteinID);
-        if(matcher.find()){
-            proteinID = matcher.group(0);
+        Matcher matcher = GI_EXTENDED.getIdPattern().matcher(proteinID);
+        if(matcher.matches()){
+            proteinID = matcher.group(1);
         }
         return proteinID;
     }

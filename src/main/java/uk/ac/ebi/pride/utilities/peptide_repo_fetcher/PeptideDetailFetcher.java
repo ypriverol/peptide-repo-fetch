@@ -47,7 +47,7 @@ public class PeptideDetailFetcher {
      */
     public Map<Tuple, Peptide> getPeptideDetails(Collection<Tuple> sequences) throws Exception {
 
-        Map<String, Peptide> peptides = new HashMap<String, Peptide>();
+        Map<Tuple, Peptide> peptides = new HashMap<String, Peptide>();
 
 //        for (Tuple sequence : sequences) {
 //    		// Validate the sequences
@@ -62,7 +62,7 @@ public class PeptideDetailFetcher {
     	
     	// add empty protein objects for all proteins that could not be retrieved
     	// and set the status to DELETED
-    	for (String accession : sequences) {
+    	for (Tuple tuple : sequences) {
     		if (!peptides.containsKey(accession)) {
     			Peptide p = new Peptide(accession);
     			p.setStatus(Peptide.STATUS.UNKNOWN);
@@ -95,21 +95,24 @@ public class PeptideDetailFetcher {
 
 
 
-    private Map<String, Peptide> getClusterPeptideDetails(Collection<Tuple> sequences) throws Exception {
+    private Map<Tuple, Peptide> getClusterPeptideDetails(Collection<Tuple> sequences) throws Exception {
     	// build the query string for the accessions
-
 
         prideClusterClient = new PRIDEClusterClient(prideClusterWSConfig);
         Map<String, Peptide> resultPeptides = new HashMap<String, Peptide>(sequences.size());
-        for(Tuple sequence: sequences){
-            PRIDEClusterResultList result = prideClusterClient.getObservByChargeState(sequence);
-            Map<Integer, Integer> prideClusterObserv = new HashMap<Integer, Integer>();
-            if(result != null && result.list != null){
-               for(PRIDEClusterResult rs: result.list){
-                   prideClusterObserv.put(rs.charge,rs.observs);
-               }
+        for(Tuple tuple: sequences){
+            String sequence = (String) tuple.getKey();
+            if(sequence != null && sequence.length() > 0){
+                PRIDEClusterResultList result = prideClusterClient.getObservByChargeState(sequence);
+                Map<Integer, Integer> prideClusterObserv = new HashMap<Integer, Integer>();
+                if(result != null && result.list != null){
+                    for(PRIDEClusterResult rs: result.list){
+                        prideClusterObserv.put(rs.charge,rs.observs);
+                    }
+                }
             }
-            Peptide pep = new Peptide(sequence);
+
+            Peptide pep = new Peptide(tuple);
             pep.setPrideClusterObserv(prideClusterObserv);
             resultPeptides.put(sequence, pep);
         }

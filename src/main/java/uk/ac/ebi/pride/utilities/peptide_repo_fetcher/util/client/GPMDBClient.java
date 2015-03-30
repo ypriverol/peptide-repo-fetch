@@ -26,7 +26,7 @@ public class GPMDBClient extends AbstractClient{
      * @return
      * @throws java.io.IOException
      */
-    public GPMDBResult getObservByChargeState(String sequence) throws IOException {
+    public GPMDBResult getObservByProtein(String sequence) throws IOException {
 
         Map<String, String> args = new HashMap<String, String>();
 

@@ -6,8 +6,6 @@ import java.util.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
 
 import uk.ac.ebi.pride.utilities.peptide_repo_fetcher.model.*;
 import uk.ac.ebi.pride.utilities.peptide_repo_fetcher.util.client.GPMDBClient;
@@ -47,14 +45,7 @@ public class PeptideDetailFetcher {
      */
     public Map<Tuple, Peptide> getPeptideDetails(Collection<Tuple> sequences) throws Exception {
 
-        Map<Tuple, Peptide> peptides = new HashMap<String, Peptide>();
-
-//        for (Tuple sequence : sequences) {
-//    		// Validate the sequences
-//    		if(sequence != null && ((String)sequence.getValue()).length() > 0) {
-//                validatedSequences.add(sequence);
-//            }
-//        }
+        Map<Tuple, Peptide> peptides = new HashMap<Tuple, Peptide>();
 
         peptides.putAll(getClusterPeptideDetails(sequences));
 
@@ -72,22 +63,19 @@ public class PeptideDetailFetcher {
         return peptides;
     }
 
-    private Map<String, Peptide> addGPMDBInformation(Map<String, Peptide> peptides) throws IOException {
+    private Map<String, Peptide> addGPMDBInformation(Map<Tuple, Peptide> peptides) throws IOException {
 
         gpmDBClient = new GPMDBClient(gpmDBWSConfig);
         Map<String, Peptide> resultPeptides = new HashMap<String, Peptide>(peptides.size());
-        for(String sequence: peptides.keySet()){
-            GPMDBResult result = gpmDBClient.getObservByChargeState(sequence);
+        for(Tuple tuple: peptides.keySet()){
+            String sequence = (String) tuple.getValue();
+            GPMDBResult result = gpmDBClient.getObservByProtein(sequence);
             Peptide peptide = peptides.get(sequence);
             Map<Integer, Integer> gpmdbOvs = new HashMap<Integer, Integer>();
             if(result != null){
-                gpmdbOvs.put(1, result.singleCharged);
-                gpmdbOvs.put(2, result.doubleCharged);
-                gpmdbOvs.put(3, result.tripleChargerd);
-                gpmdbOvs.put(4, result.fourCharge);
-                gpmdbOvs.put(5, result.fiveCharge);
+                if(result.observations.containsKey((String)tuple.getKey()));
             }
-            peptide.setGpmDBObsv(gpmdbOvs);
+            peptide.setGpmDBObsv(1);
             resultPeptides.put(sequence, peptide);
         }
         return resultPeptides;
@@ -99,7 +87,7 @@ public class PeptideDetailFetcher {
     	// build the query string for the accessions
 
         prideClusterClient = new PRIDEClusterClient(prideClusterWSConfig);
-        Map<String, Peptide> resultPeptides = new HashMap<String, Peptide>(sequences.size());
+        Map<Tuple, Peptide> resultPeptides = new HashMap<Tuple, Peptide>(sequences.size());
         for(Tuple tuple: sequences){
             String sequence = (String) tuple.getKey();
             if(sequence != null && sequence.length() > 0){
@@ -110,11 +98,12 @@ public class PeptideDetailFetcher {
                         prideClusterObserv.put(rs.charge,rs.observs);
                     }
                 }
+                Peptide pep = new Peptide(tuple);
+                pep.setPrideClusterObserv(1);
+                resultPeptides.put(tuple, pep);
             }
 
-            Peptide pep = new Peptide(tuple);
-            pep.setPrideClusterObserv(prideClusterObserv);
-            resultPeptides.put(sequence, pep);
+
         }
         return resultPeptides;
     }

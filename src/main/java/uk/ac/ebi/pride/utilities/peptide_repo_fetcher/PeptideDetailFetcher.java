@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import uk.ac.ebi.pride.utilities.peptide_repo_fetcher.model.*;
+import uk.ac.ebi.pride.utilities.peptide_repo_fetcher.util.ProteinAccessionPattern;
 import uk.ac.ebi.pride.utilities.peptide_repo_fetcher.util.client.GPMDBClient;
 import uk.ac.ebi.pride.utilities.peptide_repo_fetcher.util.client.PRIDEClusterClient;
 import uk.ac.ebi.pride.utilities.peptide_repo_fetcher.util.config.AbstractWsConfig;
@@ -84,9 +85,10 @@ public class PeptideDetailFetcher {
                 /**
                  * Right now GPMDB do not have any mapping system, at least in the web-services, we will use the more conservative
                  * approach by looking inside the GPMDB ids if it contains the Id of the protein. We will clean the Protein iD to remove the
-                 * prefix sp or gi from the ids.
+                 * prefix sp or gi from the ids. We will not work for the first release with isoforms.
                  */
                 String proteinID = (String) tuple.getKey();
+                proteinID = processProteinID(proteinID);
                 for(String resultId: result.observations.keySet()){
                     if(resultId.contains(proteinID)){
                        gpmObservation = result.observations.get(resultId);
@@ -97,6 +99,13 @@ public class PeptideDetailFetcher {
             resultPeptides.put(tuple, peptide);
         }
         return resultPeptides;
+    }
+
+    private String processProteinID(String proteinID) {
+        if(ProteinAccessionPattern.isGIAccession(proteinID)){
+            return ProteinAccessionPattern.getGIAccession(proteinID);
+
+        }
     }
 
     private Map<Tuple, Peptide> getClusterPeptideDetails(Collection<Tuple> sequences) throws Exception {

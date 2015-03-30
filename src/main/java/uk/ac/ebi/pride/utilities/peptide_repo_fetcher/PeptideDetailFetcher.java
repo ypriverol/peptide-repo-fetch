@@ -18,6 +18,7 @@ import uk.ac.ebi.pride.utilities.peptide_repo_fetcher.util.config.PRIDEClusterWs
 import uk.ac.ebi.pride.utilities.peptide_repo_fetcher.util.model.GPMDBResult;
 import uk.ac.ebi.pride.utilities.peptide_repo_fetcher.util.model.PRIDEClusterResult;
 import uk.ac.ebi.pride.utilities.peptide_repo_fetcher.util.model.PRIDEClusterResultList;
+import uk.ac.ebi.pride.utilities.util.Tuple;
 
 public class PeptideDetailFetcher {
 
@@ -44,19 +45,18 @@ public class PeptideDetailFetcher {
      * @return A Protein object containing the additional information.
      * @throws Exception error when retrieving protein accession
      */
-    public Map<String, Peptide> getPeptideDetails(Collection<String> sequences) throws Exception {
+    public Map<Tuple, Peptide> getPeptideDetails(Collection<Tuple> sequences) throws Exception {
 
         Map<String, Peptide> peptides = new HashMap<String, Peptide>();
-        Collection<String> validatedSequences = new ArrayList<String>();
 
-        for (String sequence : sequences) {
-    		// Validate the sequences
-    		if(sequence != null && sequence.length() > 0) {
-                validatedSequences.add(sequence);
-            }
-        }
+//        for (Tuple sequence : sequences) {
+//    		// Validate the sequences
+//    		if(sequence != null && ((String)sequence.getValue()).length() > 0) {
+//                validatedSequences.add(sequence);
+//            }
+//        }
 
-        peptides.putAll(getClusterPeptideDetails(validatedSequences));
+        peptides.putAll(getClusterPeptideDetails(sequences));
 
         peptides = addGPMDBInformation(peptides);
     	
@@ -95,13 +95,13 @@ public class PeptideDetailFetcher {
 
 
 
-    private Map<String, Peptide> getClusterPeptideDetails(Collection<String> sequences) throws Exception {
+    private Map<String, Peptide> getClusterPeptideDetails(Collection<Tuple> sequences) throws Exception {
     	// build the query string for the accessions
 
 
         prideClusterClient = new PRIDEClusterClient(prideClusterWSConfig);
         Map<String, Peptide> resultPeptides = new HashMap<String, Peptide>(sequences.size());
-        for(String sequence: sequences){
+        for(Tuple sequence: sequences){
             PRIDEClusterResultList result = prideClusterClient.getObservByChargeState(sequence);
             Map<Integer, Integer> prideClusterObserv = new HashMap<Integer, Integer>();
             if(result != null && result.list != null){

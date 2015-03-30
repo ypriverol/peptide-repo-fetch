@@ -1,5 +1,7 @@
 package uk.ac.ebi.pride.utilities.peptide_repo_fetcher.model;
 
+import uk.ac.ebi.pride.utilities.util.Tuple;
+
 import java.io.Serializable;
 import java.util.*;
 
@@ -13,47 +15,39 @@ public class Peptide implements Serializable {
 
     public enum STATUS {UNKNOWN, HIGH, MEDIUM, POOR, ERROR};
 
-    public String sequence;
+    public Tuple info;  // Peptide Sequence and Protein accession
 
-    public Map<Integer, Integer> prideClusterObserv;
+    public Integer prideClusterObserv;
 
     public STATUS status;
 
-    public Map<Integer, Integer> gpmDBObsv;
+    public Integer gpmDBObsv;
 
-    public Peptide(String sequence){
-        this.sequence = sequence;
+    public Peptide(Tuple info){
+        this.info = info;
     }
 
-    public String getSequence() {
-        return sequence;
-    }
-
-    public Peptide(String sequence, Map<Integer, Integer> prideClusterObserv, Map<Integer, Double> qualityScore, Map<Integer, Double> massQualityScore, STATUS status, Map<Integer, Integer> gpmDBObsv) {
-        this.sequence = sequence;
+    public Peptide(Tuple info, Integer prideClusterObserv, STATUS status, Integer gpmDBObsv) {
+        this.info = info;
         this.prideClusterObserv = prideClusterObserv;
         this.status = status;
         this.gpmDBObsv = gpmDBObsv;
     }
 
-    public void setSequence(String sequence) {
-        this.sequence = sequence;
+    public Tuple getInfo() {
+        return info;
     }
 
-    public Map<Integer, Integer> getPrideClusterObserv() {
+    public void setInfo(Tuple info) {
+        this.info = info;
+    }
+
+    public Integer getPrideClusterObserv() {
         return prideClusterObserv;
     }
 
-    public void setPrideClusterObserv(Map<Integer, Integer> prideClusterObserv) {
+    public void setPrideClusterObserv(Integer prideClusterObserv) {
         this.prideClusterObserv = prideClusterObserv;
-    }
-
-    public Integer gpmObservationsByCharge(Integer charge){
-        return gpmDBObsv.get(charge);
-    }
-
-    public Integer prideClusterObservationsByCharge(Integer charge){
-        return prideClusterObserv.get(charge);
     }
 
     public STATUS getStatus() {
@@ -64,11 +58,11 @@ public class Peptide implements Serializable {
         this.status = status;
     }
 
-    public Map<Integer, Integer> getGpmDBObsv() {
+    public Integer getGpmDBObsv() {
         return gpmDBObsv;
     }
 
-    public void setGpmDBObsv(Map<Integer, Integer> gpmDBObsv) {
+    public void setGpmDBObsv(Integer gpmDBObsv) {
         this.gpmDBObsv = gpmDBObsv;
     }
 
@@ -80,9 +74,9 @@ public class Peptide implements Serializable {
         Peptide peptide = (Peptide) o;
 
         if (gpmDBObsv != null ? !gpmDBObsv.equals(peptide.gpmDBObsv) : peptide.gpmDBObsv != null) return false;
+        if (!info.equals(peptide.info)) return false;
         if (prideClusterObserv != null ? !prideClusterObserv.equals(peptide.prideClusterObserv) : peptide.prideClusterObserv != null)
             return false;
-        if (!sequence.equals(peptide.sequence)) return false;
         if (status != peptide.status) return false;
 
         return true;
@@ -90,7 +84,7 @@ public class Peptide implements Serializable {
 
     @Override
     public int hashCode() {
-        int result = sequence.hashCode();
+        int result = info.hashCode();
         result = 31 * result + (prideClusterObserv != null ? prideClusterObserv.hashCode() : 0);
         result = 31 * result + (status != null ? status.hashCode() : 0);
         result = 31 * result + (gpmDBObsv != null ? gpmDBObsv.hashCode() : 0);

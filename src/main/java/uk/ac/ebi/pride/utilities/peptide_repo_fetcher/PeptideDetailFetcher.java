@@ -104,8 +104,8 @@ public class PeptideDetailFetcher {
     private String processProteinID(String proteinID) {
         if(ProteinAccessionPattern.isGIAccession(proteinID)){
             return ProteinAccessionPattern.getGIAccession(proteinID);
-
         }
+        return proteinID;
     }
 
     private Map<Tuple, Peptide> getClusterPeptideDetails(Collection<Tuple> sequences) throws Exception {

@@ -31,7 +31,7 @@ public class PeptideDetailFetcherTest {
     public void testGetPeptideDetails() throws Exception {
         List<Tuple> sequences = new ArrayList<Tuple>();
 
-        sequences.add(new Tuple("YLR347C","SPSSVEPVADMLMGLFFR"));
+        sequences.add(new Tuple("gi|6323379|","SPSSVEPVADMLMGLFFR"));
 
         Map<Tuple, Peptide> peptides = detailFetcher.getPeptideDetails(sequences);
 

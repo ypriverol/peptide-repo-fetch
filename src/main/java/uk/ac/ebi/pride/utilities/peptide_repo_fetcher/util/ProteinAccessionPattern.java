@@ -175,6 +175,11 @@ public enum ProteinAccessionPattern {
     }
 
     public static String getGIAccession(String proteinID) {
-        return null;
+        Pattern giPattern = Pattern.compile(".gi\\|*\\|.");
+        Matcher matcher = giPattern.matcher(proteinID);
+        if(matcher.find()){
+            proteinID = matcher.group(0);
+        }
+        return proteinID;
     }
 }

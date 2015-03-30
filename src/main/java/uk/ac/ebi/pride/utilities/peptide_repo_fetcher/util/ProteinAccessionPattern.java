@@ -108,7 +108,7 @@ public enum ProteinAccessionPattern {
     }
 
     /**
-     * Check whether it is a swissprot entry name
+     * Check whether it is a Swissprot entry name
      * @param name  entry name
      * @return boolean  true if tis a swissprot entry name
      */
@@ -180,6 +180,14 @@ public enum ProteinAccessionPattern {
 
     public static String getGIAccession(String proteinID) {
         Matcher matcher = GI_EXTENDED.getIdPattern().matcher(proteinID);
+        if(matcher.matches()){
+            proteinID = matcher.group(1);
+        }
+        return proteinID;
+    }
+
+    public static String getUniprotAccession(String proteinID){
+        Matcher matcher = SWISSPROT.getIdPattern().matcher(proteinID);
         if(matcher.matches()){
             proteinID = matcher.group(1);
         }

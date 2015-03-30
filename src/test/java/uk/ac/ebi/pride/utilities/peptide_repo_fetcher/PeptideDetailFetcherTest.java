@@ -32,6 +32,7 @@ public class PeptideDetailFetcherTest {
         List<Tuple> sequences = new ArrayList<Tuple>();
 
         sequences.add(new Tuple("gi|6323379|","SPSSVEPVADMLMGLFFR"));
+        sequences.add(new Tuple("sp|O75791|", "ILSNQEEWFK"));
 
         Map<Tuple, Peptide> peptides = detailFetcher.getPeptideDetails(sequences);
 

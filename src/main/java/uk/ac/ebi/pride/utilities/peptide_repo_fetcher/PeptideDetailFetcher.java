@@ -7,6 +7,7 @@ import java.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import uk.ac.ebi.pride.tools.utils.AccessionResolver;
 import uk.ac.ebi.pride.utilities.peptide_repo_fetcher.model.*;
 import uk.ac.ebi.pride.utilities.peptide_repo_fetcher.util.ProteinAccessionPattern;
 import uk.ac.ebi.pride.utilities.peptide_repo_fetcher.util.client.GPMDBClient;
@@ -88,7 +89,7 @@ public class PeptideDetailFetcher {
                  * prefix sp or gi from the ids. We will not work for the first release with isoforms.
                  */
                 String proteinID = (String) tuple.getKey();
-                proteinID = processProteinID(proteinID);
+                proteinID = accessionResolver(proteinID);
                 for(String resultId: result.observations.keySet()){
                     if(resultId.contains(proteinID)){
                        gpmObservation = result.observations.get(resultId);
@@ -101,9 +102,10 @@ public class PeptideDetailFetcher {
         return resultPeptides;
     }
 
-    private String processProteinID(String proteinID) {
-        if(ProteinAccessionPattern.isGIAccession(proteinID)){
-            return ProteinAccessionPattern.getGIAccession(proteinID);
+    private String accessionResolver(String proteinID) {
+        AccessionResolver accessionResolver = new AccessionResolver(proteinID, null);
+        if(accessionResolver.isValidAccession()){
+            proteinID = accessionResolver.getAccession();
         }
         return proteinID;
     }
